@@ -1,7 +1,11 @@
 import google.generativeai as genai
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # REPLACE WITH YOUR REAL KEY
-GOOGLE_API_KEY = "AIzaSyCpxJdxleAvfxp-pgcPFRVk1H_PHQ6p0WM"
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 def get_gemini_flow(topic):
     genai.configure(api_key=GOOGLE_API_KEY)

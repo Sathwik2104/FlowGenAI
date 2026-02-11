@@ -11,6 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Export Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -68,6 +71,7 @@
         }
     </style>
 </head>
+
 
 <body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
@@ -153,7 +157,31 @@
                         </svg>
                         Generated Flowchart
                     </h3>
-                    <!-- Potential download/export buttons could go here -->
+                    <div class="flex gap-2">
+                        <button onclick="exportFlow('png')"
+                            class="text-xs font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:text-blue-600 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" x2="12" y1="15" y2="3" />
+                            </svg>
+                            PNG
+                        </button>
+                        <button onclick="exportFlow('pdf')"
+                            class="text-xs font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 hover:text-red-600 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <path d="M9 13v-1h6v1" />
+                                <path d="M12 18v-6" />
+                            </svg>
+                            PDF
+                        </button>
+                    </div>
                 </div>
                 <div class="p-8 bg-white min-h-[300px] flex items-center justify-center overflow-x-auto">
                     <div class="mermaid">
@@ -220,5 +248,58 @@
         });
     </script>
 </body>
+
+<script>
+    async function exportFlow(type) {
+        const element = document.querySelector('.mermaid');
+        if (!element) return;
+
+        // Visual feedback
+        const originalOpacity = element.style.opacity;
+        element.style.opacity = '0.7';
+        document.body.style.cursor = 'wait';
+
+        try {
+            // Configuration for html2canvas
+            const canvas = await html2canvas(element, {
+                scale: 3, // Higher scale for better quality
+                backgroundColor: '#ffffff',
+                logging: false,
+                useCORS: true
+            });
+
+            if (type === 'png') {
+                const link = document.createElement('a');
+                link.download = `flowgen-chart-${Date.now()}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } else if (type === 'pdf') {
+                const { jsPDF } = window.jspdf;
+                // PDF page size calculation to fit image
+                const imgWidth = canvas.width;
+                const imgHeight = canvas.height;
+
+                // Use orientation based on aspect ratio
+                const orientation = imgWidth > imgHeight ? 'l' : 'p';
+
+                const pdf = new jsPDF({
+                    orientation: orientation,
+                    unit: 'px',
+                    format: [imgWidth, imgHeight]
+                });
+
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, imgWidth, imgHeight);
+                pdf.save(`flowgen-chart-${Date.now()}.pdf`);
+            }
+        } catch (error) {
+            console.error('Export failed:', error);
+            alert('Sorry, the export failed. Please try again.');
+        } finally {
+            // Restore visual state
+            element.style.opacity = originalOpacity;
+            document.body.style.cursor = 'default';
+        }
+    }
+</script>
 
 </html>
