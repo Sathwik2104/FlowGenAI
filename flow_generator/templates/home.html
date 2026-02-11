@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FlowGen AI</title>
+    <link href="[https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css](https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css)" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7f6; }
+        .flow-container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        /* This box will hold our diagram */
+        .mermaid { text-align: center; margin-top: 20px; }
+    </style>
+</head>
+<body class="container py-5">
+
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">FlowGen AI ⚡</h1>
+        <p class="lead text-muted">Turn ideas into flowcharts instantly.</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="flow-container mb-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="input-group input-group-lg">
+                        <input type="text" name="topic" class="form-control" placeholder="e.g. How to apply for a passport..." required>
+                        <button class="btn btn-primary" type="submit">Generate Flow</button>
+                    </div>
+                </form>
+            </div>
+
+            {% if generated_content %}
+            <div class="flow-container text-center">
+                <h3>Generated Flowchart:</h3>
+                <div class="mermaid">
+                    {{ generated_content }}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="mt-5">
+                <h5 class="text-muted">Recent Flows</h5>
+                <ul class="list-group">
+                    {% for flow in recent_flows %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ flow.topic }}
+                            <span class="badge bg-secondary rounded-pill">{{ flow.created_at|date:"M d" }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import mermaid from '[https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs](https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs)';
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+</body>
+</html>
