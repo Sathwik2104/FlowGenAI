@@ -2,9 +2,20 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from .models import Flow
 from .utils import get_gemini_flow
+
+def landing_page_view(request):
+    """
+    Landing page for unauthenticated users.
+    Redirects to the main app if already authenticated.
+    """
+    if request.user.is_authenticated:
+        return redirect('home')
+    return render(request, 'landing.html')
 
 @login_required
 def home(request):
@@ -65,4 +76,51 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('login')
+
+@login_required
+def profile_view(request):
+    if request.method == 'POST':
+        user = request.user
+        user.first_name = request.POST.get('first_name', '')
+        user.last_name = request.POST.get('last_name', '')
+        user.email = request.POST.get('email', '')
+        # Optional: check if username is unique if changing it, but keeping it simple.
+        new_username = request.POST.get('username')
+        if new_username and new_username != user.username:
+            if not User.objects.filter(username=new_username).exists():
+                user.username = new_username
+            else:
+                messages.error(request, "Username is already taken.")
+                return render(request, 'profile.html', {'user': user})
+                
+        user.save()
+        messages.success(request, "Profile updated successfully.")
+        return redirect('profile')
+        
+    return render(request, 'profile.html', {'user': request.user})
+
+@login_required
+def delete_account_view(request):
+    if request.method == 'POST':
+        user = request.user
+        user.delete()
+        messages.success(request, "Your account has been deleted.")
+        return redirect('home')
+    return redirect('profile')
+
+@login_required
+def delete_flow_view(request, flow_id):
+    if request.method == 'POST':
+        try:
+            flow = Flow.objects.get(id=flow_id, user=request.user)
+            flow.delete()
+        except Flow.DoesNotExist:
+            pass
+    return redirect('home')
+
+@login_required
+def delete_all_flows_view(request):
+    if request.method == 'POST':
+        Flow.objects.filter(user=request.user).delete()
+    return redirect('home')
