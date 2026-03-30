@@ -12,6 +12,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -54,26 +55,39 @@
     </script>
     <style>
         body {
+            background-color: #f8fafc;
+            color: #0f172a;
+            overflow-x: hidden;
+        }
+        .dark body {
             background-color: #0f172a;
             color: #f8fafc;
-            overflow-x: hidden;
         }
 
         .glass-nav {
-            background: rgba(15, 23, 42, 0.7);
+            background: rgba(255, 255, 255, 0.7);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
+        }
+        .dark .glass-nav {
+            background: rgba(15, 23, 42, 0.7);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .glass-card {
-            background: rgba(30, 41, 59, 0.6);
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
+        }
+        .dark .glass-card {
+            background: rgba(30, 41, 59, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.05);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
-        
+
         .gradient-text {
             background-clip: text;
             -webkit-background-clip: text;
@@ -92,15 +106,23 @@
             z-index: -1;
         }
     </style>
+    <script>
+        // Init theme
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    </script>
 </head>
 
 <body class="antialiased min-h-screen flex flex-col relative w-full">
 
     <!-- Animated Background Shapes -->
     <div class="fixed top-0 left-0 w-full h-full overflow-hidden z-[-1] pointer-events-none">
-        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 rounded-full shape-1 opacity-40 animate-blob"></div>
-        <div class="absolute top-[20%] right-[-10%] w-[30rem] h-[30rem] rounded-full shape-2 opacity-30 animate-blob" style="animation-delay: 2s;"></div>
-        <div class="absolute bottom-[-20%] left-[20%] w-[40rem] h-[40rem] rounded-full shape-1 opacity-20 animate-blob" style="animation-delay: 4s;"></div>
+        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 rounded-full shape-1 opacity-20 dark:opacity-40 animate-blob"></div>
+        <div class="absolute top-[20%] right-[-10%] w-[30rem] h-[30rem] rounded-full shape-2 opacity-15 dark:opacity-30 animate-blob" style="animation-delay: 2s;"></div>
+        <div class="absolute bottom-[-20%] left-[20%] w-[40rem] h-[40rem] rounded-full shape-1 opacity-10 dark:opacity-20 animate-blob" style="animation-delay: 4s;"></div>
     </div>
 
     <!-- Navbar -->
@@ -110,11 +132,21 @@
                 <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/30 group-hover:scale-105 transition-transform">
                     F
                 </div>
-                <span class="font-bold text-2xl tracking-tight text-white">FlowGen AI</span>
+                <span class="font-bold text-2xl tracking-tight text-slate-900 dark:text-white">FlowGen AI</span>
             </div>
-            <div class="flex items-center gap-4 border border-slate-700/50 rounded-full p-1 bg-slate-800/50 backdrop-blur-md">
-                <a href="{% url 'login' %}" class="text-sm font-medium text-slate-300 hover:text-white px-4 py-2 rounded-full transition-colors">Log In</a>
-                <a href="{% url 'register' %}" class="text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-2 rounded-full shadow-lg hover:shadow-blue-500/25 transition-all hover:scale-105">Get Started</a>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-4 border border-slate-200 dark:border-slate-700/50 rounded-full p-1 bg-white/50 dark:bg-slate-800/50 backdrop-blur-md">
+                    <a href="{% url 'login' %}" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white px-4 py-2 rounded-full transition-colors">Log In</a>
+                    <a href="{% url 'register' %}" class="text-sm font-medium bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-2 rounded-full shadow-lg hover:shadow-blue-500/25 transition-all hover:scale-105">Get Started</a>
+                </div>
+                <button onclick="toggleTheme()" class="p-2 rounded-full bg-slate-200/50 dark:bg-slate-700/50 text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-all shadow-sm">
+                    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                    </svg>
+                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.22 4.22a1 1 0 01-1.415-1.414l.707-.707a1 1 0 011.415 1.414l-.707.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM15.536 15.536a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414l-.707.707zM10 16a1 1 0 11-2 0v1a1 1 0 112 0v-1zm-4.22-4.22a1 1 0 011.415 1.414l-.707.707a1 1 0 11-1.415-1.414l.707-.707zM4 10a1 1 0 110-2H3a1 1 0 110 2h1zm1.536-5.536a1 1 0 111.414 1.414l-.707.707a1 1 0 01-1.414-1.414l.707-.707zM10 5a5 5 0 100 10 5 5 0 000-10z"></path>
+                    </svg>
+                </button>
             </div>
         </div>
     </nav>
@@ -123,29 +155,29 @@
     <main class="flex-grow flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 pt-32 pb-20 relative">
         <div class="text-center max-w-5xl mx-auto z-10 flex flex-col items-center">
             
-            <div class="inline-flex items-center px-4 py-1.5 rounded-full bg-slate-800/80 border border-slate-700 text-sm font-medium mb-8 text-blue-400 opacity-0 animate-fade-in-up" style="animation-delay: 0.1s;">
+            <div class="inline-flex items-center px-4 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-sm font-medium mb-8 text-blue-600 dark:text-blue-400 opacity-0 animate-fade-in-up" style="animation-delay: 0.1s;">
                 <span class="flex w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.8)]"></span>
                 The Future of Diagramming is Here
             </div>
             
-            <h1 class="text-5xl sm:text-7xl lg:text-8xl font-extrabold tracking-tight mb-8 leading-[1.1] opacity-0 animate-fade-in-up" style="animation-delay: 0.2s;">
+            <h1 class="text-5xl sm:text-7xl lg:text-8xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-8 leading-[1.1] opacity-0 animate-fade-in-up" style="animation-delay: 0.2s;">
                 Ideas to diagrams <br/>
-                in <span class="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 gradient-text">seconds.</span>
+                in <span class="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 gradient-text">seconds.</span>
             </h1>
             
-            <p class="text-lg sm:text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed opacity-0 animate-fade-in-up" style="animation-delay: 0.3s;">
+            <p class="text-lg sm:text-xl text-slate-600 dark:text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed opacity-0 animate-fade-in-up" style="animation-delay: 0.3s;">
                 Transform your plain text descriptions into beautiful, structured flowcharts instantly using the power of Google Gemini AI. No drag-and-drop required.
             </p>
             
             <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto opacity-0 animate-fade-in-up" style="animation-delay: 0.4s;">
-                <a href="{% url 'register' %}" class="w-full sm:w-auto px-8 py-4 rounded-full bg-white text-slate-900 font-bold text-lg hover:bg-blue-50 transition-all duration-300 hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.3)] flex items-center justify-center gap-2">
+                <a href="{% url 'register' %}" class="w-full sm:w-auto px-8 py-4 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-lg hover:opacity-90 transition-all duration-300 hover:scale-105 shadow-[0_10px_20px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_rgba(255,255,255,0.3)] flex items-center justify-center gap-2">
                     Start Generating for Free
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M5 12h14" />
                         <path d="m12 5 7 7-7 7" />
                     </svg>
                 </a>
-                <a href="{% url 'login' %}" class="w-full sm:w-auto px-8 py-4 rounded-full bg-slate-800 border border-slate-700 text-white font-semibold text-lg hover:bg-slate-700 transition-all duration-300">
+                <a href="{% url 'login' %}" class="w-full sm:w-auto px-8 py-4 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-semibold text-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-300 shadow-sm">
                     Sign In
                 </a>
             </div>
@@ -155,24 +187,24 @@
                 <div class="glass-card rounded-2xl p-2 relative overflow-hidden animate-float">
                     <!-- Fake Window Controls -->
                     <div class="absolute top-4 left-4 flex gap-2">
-                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
-                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-red-400 dark:bg-red-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-400 dark:bg-yellow-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-400 dark:bg-green-500"></div>
                     </div>
                     
-                    <div class="bg-slate-900/80 rounded-xl mt-8 p-6 text-left border border-slate-800">
+                    <div class="bg-slate-50 dark:bg-slate-900/80 rounded-xl mt-8 p-6 text-left border border-slate-200 dark:border-slate-800">
                         <div class="flex flex-col md:flex-row gap-8 items-center">
                             <div class="flex-1 space-y-4">
-                                <div class="w-full bg-slate-800 rounded flex items-center px-4 py-3 text-sm font-mono text-slate-300 border border-slate-700">
-                                    <span class="text-pink-400 mr-2">></span> Explain how user authentication works...
+                                <div class="w-full bg-white dark:bg-slate-800 rounded flex items-center px-4 py-3 text-sm font-mono text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                    <span class="text-pink-500 dark:text-pink-400 mr-2">></span> Explain how user authentication works...
                                 </div>
-                                <div class="w-3/4 h-2 bg-slate-800 rounded animate-pulse"></div>
-                                <div class="w-full h-2 bg-slate-800 rounded animate-pulse delay-75"></div>
-                                <div class="w-5/6 h-2 bg-slate-800 rounded animate-pulse delay-150"></div>
+                                <div class="w-3/4 h-2 bg-slate-200 dark:bg-slate-800 rounded animate-pulse"></div>
+                                <div class="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded animate-pulse delay-75"></div>
+                                <div class="w-5/6 h-2 bg-slate-200 dark:bg-slate-800 rounded animate-pulse delay-150"></div>
                             </div>
                             <div class="flex-1 flex justify-center items-center">
                                 <!-- Mock Diagram graphic -->
-                                <svg width="200" height="150" viewBox="0 0 200 150" class="text-blue-400">
+                                <svg width="200" height="150" viewBox="0 0 200 150" class="text-blue-500 dark:text-blue-400">
                                     <rect x="75" y="10" width="50" height="30" rx="4" fill="currentColor" fill-opacity="0.2" stroke="currentColor" stroke-width="2"/>
                                     <line x1="100" y1="40" x2="100" y2="70" stroke="currentColor" stroke-width="2"/>
                                     <polygon points="100,70 140,90 100,110 60,90" fill="currentColor" fill-opacity="0.2" stroke="currentColor" stroke-width="2"/>
@@ -189,35 +221,68 @@
 
             <!-- Features Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-24 text-left w-full max-w-5xl opacity-0 animate-fade-in-up" style="animation-delay: 0.8s;">
-                <div class="p-6 rounded-2xl bg-slate-800/40 border border-slate-700/50 hover:bg-slate-800/60 transition-colors">
-                    <div class="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center mb-4">
+                <div class="p-6 rounded-2xl bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50 shadow-sm dark:shadow-none hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                    <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-4">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2A14.5 14.5 0 0 0 0 12a14.5 14.5 0 0 0 12 10 14.5 14.5 0 0 0 12-10A14.5 14.5 0 0 0 12 2Z"/><path d="m14 9-2 2-2-2"/><path d="M12 11v6"/></svg>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-2">AI-Powered</h3>
-                    <p class="text-slate-400 text-sm">Powered by Google Gemini to perfectly map out complex ideas logically and accurately.</p>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">AI-Powered</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">Powered by Google Gemini to perfectly map out complex ideas logically and accurately.</p>
                 </div>
-                <div class="p-6 rounded-2xl bg-slate-800/40 border border-slate-700/50 hover:bg-slate-800/60 transition-colors">
-                    <div class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center mb-4">
+                <div class="p-6 rounded-2xl bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50 shadow-sm dark:shadow-none hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                    <div class="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-4">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-2">Easy Export</h3>
-                    <p class="text-slate-400 text-sm">Download your generated flowcharts instantly in high-resolution PNG or PDF formats.</p>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Easy Export</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">Download your generated flowcharts instantly in high-resolution PNG or PDF formats.</p>
                 </div>
-                <div class="p-6 rounded-2xl bg-slate-800/40 border border-slate-700/50 hover:bg-slate-800/60 transition-colors">
-                    <div class="w-12 h-12 rounded-xl bg-pink-500/20 text-pink-400 flex items-center justify-center mb-4">
+                <div class="p-6 rounded-2xl bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50 shadow-sm dark:shadow-none hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
+                    <div class="w-12 h-12 rounded-xl bg-pink-100 dark:bg-pink-500/20 text-pink-600 dark:text-pink-400 flex items-center justify-center mb-4">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-2">Secure History</h3>
-                    <p class="text-slate-400 text-sm">All your previously generated flows are securely saved instantly so you never lose an idea.</p>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Secure History</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">All your previously generated flows are securely saved instantly so you never lose an idea.</p>
                 </div>
             </div>
 
         </div>
     </main>
 
-    <footer class="py-8 text-center text-slate-500 text-sm z-10 border-t border-slate-800 w-full mt-auto bg-slate-900/50 backdrop-blur-sm">
+    <footer class="py-8 text-center text-slate-500 dark:text-slate-500 text-sm z-10 border-t border-slate-200 dark:border-slate-800 w-full mt-auto bg-slate-50/80 dark:bg-slate-900/50 backdrop-blur-sm transition-colors duration-300">
         <p>&copy; {% now "Y" %} FlowGen AI. Transforming thoughts into action.</p>
     </footer>
 
+    <script>
+        var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
+
+        function toggleTheme() {
+            themeToggleDarkIcon.classList.toggle('hidden');
+            themeToggleLightIcon.classList.toggle('hidden');
+
+            if (localStorage.getItem('color-theme')) {
+                if (localStorage.getItem('color-theme') === 'light') {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                }
+            } else {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                }
+            }
+        }
+    </script>
 </body>
 </html>

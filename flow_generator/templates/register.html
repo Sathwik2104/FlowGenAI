@@ -10,11 +10,19 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: { sans: ['Outfit', 'sans-serif'] },
                 }
             }
+        }
+    </script>
+    <script>
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark')
         }
     </script>
     <style>
@@ -23,61 +31,137 @@
             background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
             background-size: 20px 20px;
         }
+        .dark body {
+            background-color: #0f172a;
+            background-image: radial-gradient(#1e293b 1px, transparent 1px);
+        }
         .glass-panel {
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.5);
         }
+        .dark .glass-panel {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
         input[type="text"], input[type="password"], input[type="email"] {
-            width: 100%; padding: 0.75rem 1rem; border-radius: 0.5rem; border: 1px solid #cbd5e1; outline: none; transition: all 0.2s; background-color: #fff;
+            width: 100%; padding: 0.75rem 1rem; border-radius: 0.5rem; border: 1px solid #cbd5e1; outline: none; transition: all 0.2s; background-color: #fff; color: #0f172a;
+        }
+        .dark input[type="text"], .dark input[type="password"], .dark input[type="email"] {
+            background-color: #1e293b; border-color: #334155; color: #f8fafc;
+        }
+        input[type="text"]::placeholder, input[type="password"]::placeholder, input[type="email"]::placeholder {
+            color: #94a3b8;
+        }
+        .dark input[type="text"]::placeholder, .dark input[type="password"]::placeholder, .dark input[type="email"]::placeholder {
+            color: #64748b;
         }
         input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
-            border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+        .dark input[type="text"]:focus, .dark input[type="password"]:focus, .dark input[type="email"]:focus {
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
         }
         ul.errorlist {
             color: #ef4444; font-size: 0.75rem; margin-top: 0.25rem;
         }
+        .dark ul.errorlist {
+            color: #f87171;
+        }
     </style>
 </head>
-<body class="text-slate-800 antialiased min-h-screen flex flex-col justify-center items-center py-10 px-4">
-    <div class="mb-8 text-center">
+<body class="text-slate-800 dark:text-slate-200 antialiased min-h-screen flex flex-col justify-center items-center py-10 px-4 relative">
+    
+    <!-- Theme Toggle positioned at top right -->
+    <button onclick="toggleTheme()" class="absolute top-6 right-6 p-2 rounded-full bg-slate-200/50 dark:bg-slate-800/50 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-all shadow-sm">
+        <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+        </svg>
+        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.22 4.22a1 1 0 01-1.415-1.414l.707-.707a1 1 0 011.415 1.414l-.707.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM15.536 15.536a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414l-.707.707zM10 16a1 1 0 11-2 0v1a1 1 0 112 0v-1zm-4.22-4.22a1 1 0 011.415 1.414l-.707.707a1 1 0 11-1.415-1.414l.707-.707zM4 10a1 1 0 110-2H3a1 1 0 110 2h1zm1.536-5.536a1 1 0 111.414 1.414l-.707.707a1 1 0 01-1.414-1.414l.707-.707zM10 5a5 5 0 100 10 5 5 0 000-10z"></path>
+        </svg>
+    </button>
+    
+    <a href="{% url 'landing' %}" class="absolute top-6 left-6 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-2 text-sm font-medium">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m15 18-6-6 6-6"/>
+        </svg>
+        Back to Home
+    </a>
+
+    <div class="mb-8 text-center mt-12">
         <div class="w-12 h-12 mx-auto rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-blue-500/30 mb-4">
             F
         </div>
-        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Create an account</h1>
-        <p class="text-slate-500 mt-2">Get started with FlowGen AI</p>
+        <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Create an account</h1>
+        <p class="text-slate-500 dark:text-slate-400 mt-2">Get started with FlowGen AI</p>
     </div>
 
-    <div class="w-full max-w-md glass-panel rounded-2xl shadow-xl shadow-slate-200/50 p-8">
+    <div class="w-full max-w-md glass-panel rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none p-8">
         <form method="POST" class="space-y-6">
             {% csrf_token %}
             {% if form.non_field_errors %}
-            <div class="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100">
+            <div class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm border border-red-100 dark:border-red-900">
                 {{ form.non_field_errors }}
             </div>
             {% endif %}
             
             {% for field in form %}
             <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" for="{{ field.id_for_label }}">{{ field.label }}</label>
                 {{ field }}
                 {% if field.help_text %}
-                <p class="text-xs text-slate-400 mt-1">{{ field.help_text|safe }}</p>
+                <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">{{ field.help_text|safe }}</p>
                 {% endif %}
                 {% for error in field.errors %}
-                <p class="text-xs text-red-500 mt-1">{{ error }}</p>
+                <p class="text-xs text-red-500 dark:text-red-400 mt-1">{{ error }}</p>
                 {% endfor %}
             </div>
             {% endfor %}
 
-            <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-3 rounded-xl transition-colors shadow-lg shadow-slate-900/20 flex justify-center items-center gap-2">
+            <button type="submit" class="w-full bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-500 text-white font-medium py-3 rounded-xl transition-colors shadow-lg shadow-slate-900/20 dark:shadow-none flex justify-center items-center gap-2">
                 Sign Up
             </button>
         </form>
-        <div class="mt-6 text-center text-sm text-slate-500">
-            Already have an account? <a href="{% url 'login' %}" class="text-blue-600 hover:text-blue-700 font-medium">Log in</a>
+        <div class="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
+            Already have an account? <a href="{% url 'login' %}" class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium">Log in</a>
         </div>
     </div>
+    
+    <script>
+        var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
+
+        function toggleTheme() {
+            themeToggleDarkIcon.classList.toggle('hidden');
+            themeToggleLightIcon.classList.toggle('hidden');
+
+            if (localStorage.getItem('color-theme')) {
+                if (localStorage.getItem('color-theme') === 'light') {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                }
+            } else {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                }
+            }
+        }
+    </script>
 </body>
 </html>

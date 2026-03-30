@@ -76,7 +76,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('landing')
 
 @login_required
 def profile_view(request):
@@ -123,4 +123,4 @@ def delete_flow_view(request, flow_id):
 def delete_all_flows_view(request):
     if request.method == 'POST':
         Flow.objects.filter(user=request.user).delete()
-    return redirect('home')
+    return redirect('home')
